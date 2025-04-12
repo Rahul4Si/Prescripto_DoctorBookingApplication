@@ -67,7 +67,7 @@ const AdminAddDoctor = ({ doctor }) => {
         image,
       } = formData;
       const response = await axios.post(
-        "http://localhost:8000/api/admin/addDoctor",
+        "https://prescripto-doctorbookingapplication.onrender.com/api/admin/addDoctor",
         {
           name: doctorName,
           email: doctorEmail,
@@ -121,7 +121,7 @@ const AdminAddDoctor = ({ doctor }) => {
         image,
       } = formData;
       const response = await axios.post(
-        `http://localhost:8000/api/admin/updateDoctor`,
+        `https://prescripto-doctorbookingapplication.onrender.com/api/admin/updateDoctor`,
         {
           doctorId: doctor._id,
           name: doctorName,
