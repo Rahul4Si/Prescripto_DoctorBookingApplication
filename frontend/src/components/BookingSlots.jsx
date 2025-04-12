@@ -43,7 +43,7 @@ const BookingSlots = ({doctorId}) => {
 
   const handleDoctorBooking = async() => {
     try {
-      const response = await axios.post('http://localhost:8000/api/user/bookDoctor', {doctorId,slotDate:selectedDate.date,slotTime:selectedTime}, {headers: {token: localStorage.getItem('token')}});
+      const response = await axios.post('https://prescripto-doctorbookingapplication.onrender.com/api/user/bookDoctor', {doctorId,slotDate:selectedDate.date,slotTime:selectedTime}, {headers: {token: localStorage.getItem('token')}});
       if (response.data.success) {
         toast.success(response.data.message);
         setSelectedDate({});
@@ -66,7 +66,7 @@ const BookingSlots = ({doctorId}) => {
         navigate('/login');
         return;
       }
-      const response = await axios.post('http://localhost:8000/api/user/checkBookingStatus', {doctorId,slotDate:selectedDate.date,slotTime:selectedTime}, {headers: {token: localStorage.getItem('token')}});
+      const response = await axios.post('https://prescripto-doctorbookingapplication.onrender.com/api/user/checkBookingStatus', {doctorId,slotDate:selectedDate.date,slotTime:selectedTime}, {headers: {token: localStorage.getItem('token')}});
       if (response.data.success) {
         setBookStatus(true);
         toast.success(response.data.message);
