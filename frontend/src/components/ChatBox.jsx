@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import axios from "axios";
+import { BASE_URL } from "../config/apiConfig";
 
 const ChatBox = () => {
-  const [chatConversation, setChatConversation] = useState(["How may I help you?"]);
+  const [chatConversation, setChatConversation] = useState([
+    "How may I help you?",
+  ]);
   const [chatMessages, setChatMessages] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef(null);
@@ -19,47 +23,24 @@ const ChatBox = () => {
   };
 
   const handleSendMessages = async () => {
+    if (!chatMessages.trim()) return; // Prevent sending empty messages
+
+    // Append user's message to the chat conversation
+    setChatConversation((prev) => [...prev, chatMessages]);
+    setChatMessages(""); // Clear input field
+
     try {
-      if (!chatMessages || !chatMessages.trim()) return;
+      const response = await axios.post(`${BASE_URL}/api/user/getAIResponse`,{ message: chatMessages });
 
-      // Add user message before API call
-      setChatConversation(prev => [...prev, chatMessages]);
-      setChatMessages("");
-
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer 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`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          "model": "deepseek/deepseek-r1:free",
-          "messages": [{ "role": "user", "content": chatMessages }]
-        })
-      });
-
-      if (!response.ok) {
-        console.error(`API Error: ${response.status} - ${response.statusText}`);
-        setChatConversation(prev => [...prev, "Error: Unable to fetch response from AI."]);
-        return;
-      }
-
-      const data = await response.json();
-
-      if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-        console.error("Invalid API response format:", data);
-        setChatConversation(prev => [...prev, "Error: Invalid response from AI."]);
-        return;
-      }
-
-      const markDownText = data.choices[0].message.content || "No response received";
-
-      // Append AI response
-      setChatConversation(prev => [...prev, markDownText]);
-
+      // Append AI's response to the chat conversation
+      const aiMessage = response.data.choices[0]?.message?.content || "No response";
+      setChatConversation((prev) => [...prev, aiMessage]);
     } catch (error) {
-      console.error("Error fetching prediction:", error);
-      setChatConversation(prev => [...prev, "Error: Unable to connect to AI service."]);
+      console.log(
+        "Error from GROQ API:",
+        error.response?.data || error.message
+      );
+      setChatConversation((prev) => [...prev, "Error: Unable to fetch response"]);
     }
   };
 
@@ -78,7 +59,11 @@ const ChatBox = () => {
         <div id="chat_messages">
           {chatConversation.map((msg, index) => (
             <div key={index} className="p-2 flex flex-col">
-              <div className={`flex space-x-2 ${index % 2 === 0 ? "justify-start" : "justify-end"}`}>
+              <div
+                className={`flex space-x-2 ${
+                  index % 2 === 0 ? "justify-start" : "justify-end"
+                }`}
+              >
                 {index % 2 === 0 ? (
                   <img
                     className="w-8 h-8"
@@ -92,7 +77,9 @@ const ChatBox = () => {
                     alt="user_Photo"
                   />
                 )}
-                <div className="bg-blue-600 text-white p-2 rounded-lg">{msg}</div>
+                <div className="bg-blue-600 text-white p-2 rounded-lg">
+                  {msg}
+                </div>
               </div>
             </div>
           ))}
