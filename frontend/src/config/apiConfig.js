@@ -1,1 +1,1 @@
-export const BASE_URL = "https://prescripto-doctorbookingapplication-wog5.onrender.com";
+export const BASE_URL = "https://prescripto-doctorbookingapplication.onrender.com";
